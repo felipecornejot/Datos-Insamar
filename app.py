@@ -17,14 +17,14 @@ st.set_page_config(
 )
 
 # =========================
-# 1) Paleta (derivada del logo que compartiste)
+# 1) Paleta (derivada del logo)
 # =========================
-COL_BG = "#000F30"       # navy profundo
-COL_PANEL = "#031A46"    # panel/vidrio
-COL_ACCENT = "#0D9CD8"   # cian
-COL_ACCENT_2 = "#3867A6" # azul medio
-COL_TEXT = "#E3E3E8"     # gris muy claro
-COL_MUTED = "#A9B3C7"    # muted
+COL_BG = "#000F30"        # navy profundo
+COL_PANEL = "#031A46"     # panel/vidrio
+COL_ACCENT = "#0D9CD8"    # cian
+COL_ACCENT_2 = "#3867A6"  # azul medio
+COL_TEXT = "#E3E3E8"      # gris muy claro
+COL_MUTED = "#A9B3C7"     # muted
 COL_GRID = "rgba(227,227,232,0.12)"
 
 # =========================
@@ -40,12 +40,23 @@ st.markdown(
               linear-gradient(180deg, {COL_BG} 0%, #00081F 100%);
   color: {COL_TEXT};
 }}
-
-/* Tipografía y links */
-html, body, [class*="css"] {{
-  color: {COL_TEXT};
-}}
+html, body, [class*="css"] {{ color: {COL_TEXT}; }}
 a {{ color: {COL_ACCENT}; }}
+
+/* Sidebar look */
+section[data-testid="stSidebar"] {{
+  background: linear-gradient(180deg, rgba(0,15,48,0.92), rgba(0,8,31,0.92)) !important;
+  border-right: 1px solid rgba(227,227,232,0.10);
+}}
+
+/* Panel “vidrio” */
+.panel {{
+  background: rgba(3,26,70,0.35);
+  border: 1px solid rgba(227,227,232,0.14);
+  border-radius: 18px;
+  padding: 16px 16px 10px 16px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.30);
+}}
 
 /* Header marca */
 .brand {{
@@ -73,86 +84,33 @@ a {{ color: {COL_ACCENT}; }}
   font-size: 13px; color: {COL_MUTED};
 }}
 
-/* Cards KPIs */
+/* KPIs */
 .kpi-grid {{
   display:grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}}
-@media (max-width: 1100px) {{
-  .kpi-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 10px 0 8px 0;
 }}
 .kpi {{
-  background: rgba(3,26,70,0.62);
-  border: 1px solid rgba(227,227,232,0.12);
-  border-radius: 18px;
-  padding: 14px 14px 12px 14px;
-  box-shadow: 0 16px 36px rgba(0,0,0,0.25);
-  backdrop-filter: blur(10px);
+  background: rgba(3,26,70,0.35);
+  border: 1px solid rgba(227,227,232,0.14);
+  border-radius: 16px;
+  padding: 12px 12px 10px 12px;
 }}
 .kpi .label {{
   font-size: 12px;
   color: {COL_MUTED};
+  margin-bottom: 6px;
 }}
 .kpi .value {{
   font-size: 22px;
   font-weight: 800;
-  margin-top: 6px;
+  letter-spacing: 0.2px;
 }}
 .kpi .hint {{
-  margin-top: 6px;
   font-size: 11px;
-  color: rgba(227,227,232,0.70);
-}}
-
-/* Paneles */
-.panel {{
-  background: rgba(3,26,70,0.50);
-  border: 1px solid rgba(227,227,232,0.12);
-  border-radius: 18px;
-  padding: 14px;
-  box-shadow: 0 14px 34px rgba(0,0,0,0.22);
-  backdrop-filter: blur(10px);
-}}
-
-/* Dataframe */
-[data-testid="stDataFrame"] {{
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(227,227,232,0.12);
-}}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {{
-  background: linear-gradient(180deg, rgba(3,26,70,0.85), rgba(0,8,31,0.95));
-  border-right: 1px solid rgba(227,227,232,0.10);
-}}
-section[data-testid="stSidebar"] * {{
-  color: {COL_TEXT};
-}}
-
-/* =========================
-   Widgets SIN fondo blanco (glass)
-   ========================= */
-
-/* Inputs generales */
-div[data-testid="stTextInput"] input,
-div[data-testid="stNumberInput"] input,
-div[data-testid="stDateInput"] input {{
-  background: rgba(3,26,70,0.45) !important;
-  color: {COL_TEXT} !important;
-  border: 1px solid rgba(227,227,232,0.18) !important;
-  border-radius: 14px !important;
-}}
-/* Select / multiselect (BaseWeb) */
-div[data-baseweb="select"] > div {{
-  background: rgba(3,26,70,0.45) !important;
-  border: 1px solid rgba(227,227,232,0.18) !important;
-  border-radius: 14px !important;
-}}
-/* Placeholder text */
-input::placeholder {{
-  color: rgba(227,227,232,0.50) !important;
+  color: rgba(227,227,232,0.65);
+  margin-top: 6px;
 }}
 
 /* File uploader dropzone */
@@ -164,7 +122,6 @@ div[data-testid="stFileUploaderDropzone"] {{
 div[data-testid="stFileUploaderDropzone"] * {{
   color: {COL_TEXT} !important;
 }}
-/* Botón "Browse files" dentro del uploader */
 div[data-testid="stFileUploaderDropzone"] button {{
   background: rgba(13,156,216,0.18) !important;
   color: {COL_TEXT} !important;
@@ -184,6 +141,40 @@ div[data-testid="stDownloadButton"] > button {{
 .stButton > button:hover,
 div[data-testid="stDownloadButton"] > button:hover {{
   border: 1px solid rgba(13,156,216,0.55) !important;
+}}
+
+/* ====== FIX “fondos blancos” en widgets (inputs/selects/date/multiselect/slider) ====== */
+div[data-baseweb="base-input"] > div {{
+  background: rgba(3,26,70,0.35) !important;
+  border: 1px solid rgba(227,227,232,0.18) !important;
+  border-radius: 14px !important;
+}}
+div[data-baseweb="base-input"] input,
+div[data-baseweb="base-input"] textarea {{
+  background: transparent !important;
+  color: {COL_TEXT} !important;
+}}
+div[data-baseweb="select"] > div {{
+  background: rgba(3,26,70,0.35) !important;
+  border: 1px solid rgba(227,227,232,0.18) !important;
+  border-radius: 14px !important;
+}}
+div[data-baseweb="select"] * {{
+  color: {COL_TEXT} !important;
+}}
+/* Date picker popover */
+div[data-baseweb="popover"] > div {{
+  background: rgba(0,15,48,0.98) !important;
+  border: 1px solid rgba(227,227,232,0.18) !important;
+}}
+/* Slider track */
+div[data-testid="stSlider"] [data-baseweb="slider"] > div {{
+  background: rgba(227,227,232,0.14) !important;
+}}
+/* Dataframes */
+div[data-testid="stDataFrame"] {{
+  background: rgba(3,26,70,0.20) !important;
+  border-radius: 14px !important;
 }}
 </style>
     """,
@@ -218,6 +209,7 @@ def _safe_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
 def load_data_from_excel(file) -> pd.DataFrame:
     df = pd.read_excel(file, sheet_name="Data venta")
 
+    # Fecha
     col_date = _safe_col(df, ["Fecha de contabilización", "Fecha"])
     if col_date:
         df[col_date] = pd.to_datetime(df[col_date], errors="coerce")
@@ -263,11 +255,7 @@ def load_data_from_excel(file) -> pd.DataFrame:
     return df
 
 def kpi_cards(kpis: list[tuple[str, str, str]]):
-    """
-    Fix crítico:
-    - NO meter HTML con indentación (Markdown lo interpreta como code block).
-    - Construimos el HTML sin espacios iniciales por línea.
-    """
+    # Fix: no indent HTML lines (para que Markdown no lo interprete como code block)
     parts = ['<div class="kpi-grid">']
     for label, value, hint in kpis:
         parts.append(
@@ -322,9 +310,16 @@ except Exception as e:
 # =========================
 with st.sidebar:
     st.markdown("### 🎛️ Filtros")
+
     min_d = df["Fecha"].min().date()
     max_d = df["Fecha"].max().date()
-    d1, d2 = st.date_input("Rango de fechas", value=(min_d, max_d), min_value=min_d, max_value=max_d)
+
+    d1, d2 = st.date_input(
+        "Rango de fechas",
+        value=(min_d, max_d),
+        min_value=min_d,
+        max_value=max_d,
+    )
 
     clientes = sorted(df["Cliente"].dropna().unique().tolist())
     vendedores = sorted(df["Vendedor"].dropna().unique().tolist())
@@ -335,7 +330,7 @@ with st.sidebar:
     txt_producto = st.text_input(
         "Buscar producto (contiene)",
         value="",
-        help="Ej: 11R22.5, 295/80R22.5, PBA60, etc."
+        help="Ej: 11R22.5, 295/80R22.5, PBA60, etc.",
     )
 
     st.markdown("---")
@@ -343,8 +338,76 @@ with st.sidebar:
     group_main = st.selectbox(
         "Agrupar análisis por",
         options=["Mes", "Trimestre", "Cliente", "Vendedor", "Producto"],
-        index=0
+        index=0,
     )
     top_n = st.slider("Top N (clientes/productos)", 5, 30, 12)
 
-mask = (df["Fecha"].dt.date >= d1) & (df["Fecha"].dt.
+# === FIX CRÍTICO: la línea del mask va completa (sin paréntesis abiertos) ===
+mask = (df["Fecha"].dt.date >= d1) & (df["Fecha"].dt.date <= d2)
+if sel_clientes:
+    mask &= df["Cliente"].isin(sel_clientes)
+if sel_vendedores:
+    mask &= df["Vendedor"].isin(sel_vendedores)
+if txt_producto.strip():
+    mask &= df["Producto"].astype(str).str.contains(txt_producto.strip(), case=False, na=False)
+
+dff = df[mask].copy()
+
+# =========================
+# 7) KPIs principales
+# =========================
+total_clp = float(dff["VentaCLP"].sum())
+total_qty = float(dff["Cantidad"].sum())
+avg_unit = float(dff["VentaCLP"].sum() / max(dff["Cantidad"].sum(), 1))
+docs = int(dff["Documento"].nunique())
+custs = int(dff["Cliente"].nunique())
+
+kpis = [
+    ("Venta total (CLP)", _fmt_clp(total_clp), "Suma de “Venta” en el rango filtrado"),
+    ("Unidades", f"{total_qty:,.0f}".replace(",", "."), "Suma de “Quantity”"),
+    ("Precio prom. por unidad", _fmt_clp(avg_unit), "Venta / Unidades (promedio ponderado)"),
+    ("Documentos", f"{docs:,}".replace(",", "."), "N° interno único"),
+    ("Clientes únicos", f"{custs:,}".replace(",", "."), "Clientes distintos en el período"),
+]
+kpi_cards(kpis)
+
+if show_usd:
+    st.caption(f"Conversión informativa: 1 USD = {usd_rate:,.0f} CLP".replace(",", "."))
+    kpis_usd = [
+        ("Venta total (USD)", _fmt_usd(total_clp / usd_rate), "CLP → USD (tipo cambio indicado)"),
+        ("Precio prom. (USD/ud)", _fmt_usd(avg_unit / usd_rate), "Promedio ponderado (CLP → USD)"),
+    ]
+    kpi_cards(kpis_usd)
+
+st.markdown("---")
+
+# =========================
+# 8) Visualizaciones
+# =========================
+colA, colB = st.columns([1.15, 0.85], gap="large")
+
+with colA:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown("#### 📈 Evolución de ventas (tendencia)")
+    st.caption("Comportamiento temporal. Útil para estacionalidad, quiebres o picos de demanda.")
+
+    ts = (
+        dff.groupby("Mes", as_index=False)
+        .agg(VentaCLP=("VentaCLP", "sum"), Unidades=("Cantidad", "sum"), Docs=("Documento", "nunique"))
+        .sort_values("Mes")
+    )
+
+    fig_ts = px.line(
+        ts,
+        x="Mes",
+        y="VentaCLP",
+        markers=True,
+        hover_data={"Unidades": True, "Docs": True, "VentaCLP": ":,.0f"},
+    )
+    fig_ts.update_layout(
+        height=380,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=COL_TEXT),
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=True, gridcolor=COL
