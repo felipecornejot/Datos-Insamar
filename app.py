@@ -410,4 +410,141 @@ with colA:
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color=COL_TEXT),
         xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=True, gridcolor=COL
+        yaxis=dict(showgrid=True, gridcolor=COL_GRID),
+        margin=dict(l=10, r=10, t=10, b=10),
+    )
+    st.plotly_chart(fig_ts, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown("#### 🧪 Distribución de precios unitarios")
+    st.caption("Detecta outliers y rangos típicos (por unidad).")
+
+    fig_hist = px.histogram(
+        dff[dff["PrecioUnit"] > 0],
+        x="PrecioUnit",
+        nbins=40,
+        hover_data=["Producto", "Cliente", "Vendedor"],
+    )
+    fig_hist.update_layout(
+        height=330,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=COL_TEXT),
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=True, gridcolor=COL_GRID),
+        margin=dict(l=10, r=10, t=10, b=10),
+    )
+    st.plotly_chart(fig_hist, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with colB:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown("#### 🏆 Top (por ventas)")
+    st.caption("Ranking dinámico según agrupación seleccionada (Top N).")
+
+    group_col = {
+        "Mes": "Mes",
+        "Trimestre": "Trimestre",
+        "Cliente": "Cliente",
+        "Vendedor": "Vendedor",
+        "Producto": "Producto",
+    }[group_main]
+
+    top = (
+        dff.groupby(group_col, as_index=False)
+        .agg(VentaCLP=("VentaCLP", "sum"), Unidades=("Cantidad", "sum"), Docs=("Documento", "nunique"))
+        .sort_values("VentaCLP", ascending=False)
+        .head(top_n)
+    )
+
+    fig_top = px.bar(
+        top.sort_values("VentaCLP", ascending=True),
+        x="VentaCLP",
+        y=group_col,
+        orientation="h",
+        hover_data={"Unidades": True, "Docs": True, "VentaCLP": ":,.0f"},
+    )
+    fig_top.update_layout(
+        height=720,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=COL_TEXT),
+        xaxis=dict(showgrid=True, gridcolor=COL_GRID),
+        yaxis=dict(showgrid=False),
+        margin=dict(l=10, r=10, t=10, b=10),
+    )
+    st.plotly_chart(fig_top, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# =========================
+# 9) Tablas (director-ready)
+# =========================
+gcols = [group_col] if group_col in dff.columns else ["Cliente"]
+
+summary = (
+    dff.groupby(gcols, as_index=False)
+    .agg(
+        VentaCLP=("VentaCLP", "sum"),
+        Unidades=("Cantidad", "sum"),
+        Docs=("Documento", "nunique"),
+        Clientes=("Cliente", "nunique"),
+    )
+)
+summary["PrecioPromCLP"] = np.where(summary["Unidades"] > 0, summary["VentaCLP"] / summary["Unidades"], np.nan)
+summary = summary.sort_values("VentaCLP", ascending=False)
+
+c1, c2 = st.columns([1, 1], gap="large")
+
+with c1:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown("#### Resumen agregado")
+    st.dataframe(summary.head(40), use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with c2:
+    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown("#### Detalle (filtrado)")
+    st.dataframe(dff.sort_values("Fecha", ascending=False).head(2000), use_container_width=True, hide_index=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# 10) Export
+# =========================
+export_cols = [
+    "Fecha", "Documento", "CodCliente", "Cliente", "Vendedor",
+    "ItemCode", "Producto", "Cantidad", "PrecioUnit", "VentaCLP",
+    "Mes", "Trimestre",
+]
+export_cols = [c for c in export_cols if c in dff.columns]
+csv_bytes = dff[export_cols].to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "⬇️ Descargar datos filtrados (CSV)",
+    data=csv_bytes,
+    file_name="INSAMAR_ventas_filtradas.csv",
+    mime="text/csv",
+)
+
+with st.expander("🧠 Cómo leer este dashboard (2 minutos)"):
+    st.markdown(
+        """
+**Qué hace esto**
+- Permite **filtrar** ventas por fecha, cliente, vendedor y texto en producto.
+- Entrega **KPIs operativos** (venta, unidades, precio promedio ponderado, documentos, clientes).
+- Muestra **tendencia mensual**, distribución de precios, y rankings según la agrupación seleccionada.
+- Incluye vista “director” con **resumen agregable** + **detalle exportable**.
+
+**Definiciones**
+- **Venta total**: suma de “Venta”.
+- **Unidades**: suma de “Quantity”.
+- **Precio prom. por unidad**: Venta / Unidades (ponderado).
+- **Documento**: “Número interno” único.
+
+**Usos típicos**
+- Detectar meses pico/bajo, clientes concentrados, productos dominantes, outliers de precio.
+        """
+    )
+
