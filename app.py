@@ -26,6 +26,7 @@ COL_ACCENT_2 = "#3867A6"  # azul medio
 COL_TEXT = "#E3E3E8"      # gris muy claro
 COL_MUTED = "#A9B3C7"     # muted
 COL_GRID = "rgba(227,227,232,0.12)"
+COL_DARK_TEXT = "#1A1F2A"  # texto oscuro para inputs blancos
 
 # =========================
 # 2) CSS — estilo “artistico abierto”
@@ -33,6 +34,24 @@ COL_GRID = "rgba(227,227,232,0.12)"
 st.markdown(
     f"""
 <style>
+/* ===== Top header transparente (quita barra blanca) ===== */
+header[data-testid="stHeader"] {{
+  background: transparent !important;
+}}
+header[data-testid="stHeader"]::before {{
+  background: transparent !important;
+}}
+div[data-testid="stToolbar"] {{
+  background: transparent !important;
+}}
+div[data-testid="stDecoration"] {{
+  background: transparent !important;
+}}
+/* en algunas versiones, esto también ayuda */
+div[data-testid="stAppViewContainer"] > .main > div:first-child {{
+  background: transparent !important;
+}}
+
 /* Fondo general */
 .stApp {{
   background: radial-gradient(1200px 700px at 15% 10%, rgba(13,156,216,0.18), transparent 60%),
@@ -47,6 +66,27 @@ a {{ color: {COL_ACCENT}; }}
 section[data-testid="stSidebar"] {{
   background: linear-gradient(180deg, rgba(0,15,48,0.92), rgba(0,8,31,0.92)) !important;
   border-right: 1px solid rgba(227,227,232,0.10);
+}}
+
+/* >>> Textos del sidebar (títulos/labels/ayudas) más blancos para contraste */
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] .stMarkdown p,
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3,
+section[data-testid="stSidebar"] h4,
+section[data-testid="stSidebar"] h5,
+section[data-testid="stSidebar"] h6 {{
+  color: rgba(255,255,255,0.92) !important;
+}}
+section[data-testid="stSidebar"] label {{
+  color: rgba(255,255,255,0.92) !important;
+}}
+/* ayuda pequeña (caption/help) */
+section[data-testid="stSidebar"] .stCaption,
+section[data-testid="stSidebar"] small,
+section[data-testid="stSidebar"] [data-testid="stTooltipIcon"] {{
+  color: rgba(255,255,255,0.85) !important;
 }}
 
 /* Panel “vidrio” */
@@ -143,7 +183,7 @@ div[data-testid="stDownloadButton"] > button:hover {{
   border: 1px solid rgba(13,156,216,0.55) !important;
 }}
 
-/* ====== FIX “fondos blancos” en widgets (inputs/selects/date/multiselect/slider) ====== */
+/* ===== Widgets generales (mantén estilo oscuro en main) ===== */
 div[data-baseweb="base-input"] > div {{
   background: rgba(3,26,70,0.35) !important;
   border: 1px solid rgba(227,227,232,0.18) !important;
@@ -162,19 +202,51 @@ div[data-baseweb="select"] > div {{
 div[data-baseweb="select"] * {{
   color: {COL_TEXT} !important;
 }}
+
 /* Date picker popover */
 div[data-baseweb="popover"] > div {{
   background: rgba(0,15,48,0.98) !important;
   border: 1px solid rgba(227,227,232,0.18) !important;
 }}
+
 /* Slider track */
 div[data-testid="stSlider"] [data-baseweb="slider"] > div {{
   background: rgba(227,227,232,0.14) !important;
 }}
+
 /* Dataframes */
 div[data-testid="stDataFrame"] {{
   background: rgba(3,26,70,0.20) !important;
   border-radius: 14px !important;
+}}
+
+/* ===== Sidebar: inputs blancos con texto oscuro (para que 950 y fechas se lean) ===== */
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] > div {{
+  background: rgba(255,255,255,0.96) !important;
+  border: 1px solid rgba(227,227,232,0.25) !important;
+}}
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] input,
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] textarea {{
+  color: {COL_DARK_TEXT} !important;
+}}
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] input::placeholder {{
+  color: rgba(26,31,42,0.55) !important;
+}}
+/* iconos dentro de inputs (calendario, etc.) */
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] svg {{
+  fill: rgba(26,31,42,0.70) !important;
+}}
+/* botones + / - del number_input */
+section[data-testid="stSidebar"] div[data-baseweb="base-input"] button {{
+  color: rgba(26,31,42,0.85) !important;
+}}
+
+/* Mantén selects/multiselect oscuros (se leen bien) */
+section[data-testid="stSidebar"] div[data-baseweb="select"] > div {{
+  background: rgba(3,26,70,0.35) !important;
+}}
+section[data-testid="stSidebar"] div[data-baseweb="select"] * {{
+  color: {COL_TEXT} !important;
 }}
 </style>
     """,
@@ -255,7 +327,6 @@ def load_data_from_excel(file) -> pd.DataFrame:
     return df
 
 def kpi_cards(kpis: list[tuple[str, str, str]]):
-    # Fix: no indent HTML lines (para que Markdown no lo interprete como code block)
     parts = ['<div class="kpi-grid">']
     for label, value, hint in kpis:
         parts.append(
@@ -342,7 +413,6 @@ with st.sidebar:
     )
     top_n = st.slider("Top N (clientes/productos)", 5, 30, 12)
 
-# === FIX CRÍTICO: la línea del mask va completa (sin paréntesis abiertos) ===
 mask = (df["Fecha"].dt.date >= d1) & (df["Fecha"].dt.date <= d2)
 if sel_clientes:
     mask &= df["Cliente"].isin(sel_clientes)
@@ -547,4 +617,3 @@ with st.expander("🧠 Cómo leer este dashboard (2 minutos)"):
 - Detectar meses pico/bajo, clientes concentrados, productos dominantes, outliers de precio.
         """
     )
-
